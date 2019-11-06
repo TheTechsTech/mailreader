@@ -285,7 +285,7 @@ class MailParser
             $contentTypeRegex = '/^Content-Type: ?text\/plain/i';
         
         // there could be more than one boundary. This also skips the quotes if they are included.
-        \preg_match_all('/boundary=(?:|")([a-zA-Z0-9_=\.\(\)_\/+-]+)(?:|")(?:$|;)/mi', $this->raw, $matches);
+        \preg_match_all('/(*ANYCRLF)boundary=(?:|")([a-zA-Z0-9_=\.\(\)_\/+-]+)(?:|")(?:$|;)/mi', $this->raw, $matches);
         $boundaries = $matches[1];
         // sometimes boundaries are delimited by quotes - we want to remove them
         foreach ($boundaries as $i => $v) {
@@ -321,7 +321,7 @@ class MailParser
                 
                 // if the delimited is AAAAA, the line will be --AAAAA  - that's why we use substr
                 if (\is_array($boundaries)) {
-                    if (\in_array(\substr($line, 2), $boundaries)) {  // found the delimiter
+                    if (\in_array(\substr($line, 2), $boundaries) || \in_array(\substr($line, 2, -2), $boundaries)) {  // found the delimiter
                         break;
                     }
                 }
