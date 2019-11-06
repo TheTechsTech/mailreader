@@ -1,14 +1,17 @@
 {
-    "name": "forked/mailreader",
+    "name": "adhayward/mailreader",
     "type": "library",
     "description": "A fully tested simple email reader parser for PHP 5.6+.",
     "keywords": ["pipe", "email", "reader", "parser", "decode"],
-    "homepage": "https://github.com/techno-express/mailreader",
+    "homepage": "https://github.com/adhayward/mailreader",
     "support": {
-        "issues": "https://github.com/techno-express/mailreader/issues"
+        "issues": "https://github.com/adhayward/mailreader/issues"
     },
     "license": ["LGPL-3.0-or-later"],
     "authors": [
+        {
+            "name": "Adam Hayward"
+        },
         {
             "name": "Michael Moore",
             "email": "stuporglue@gmail.com",
