@@ -75,12 +75,10 @@ class MailParserTest extends TestCase
         $email = new MailParser(\file_get_contents($file));
 
         $this->assertEquals('dan@test.com', $email->getFromEmail());
-
     }
 
     public function testPlainBody()
     {
-        
         $file = __DIR__ . '/emails/m0002';
         $email = new MailParser(\file_get_contents($file));
         $email->removeMimeType('audio/caf');
@@ -99,7 +97,6 @@ support@foobar.com';
 
     public function testHtmlBody()
     {
-        
         $file = __DIR__ . '/emails/m0003';
         $email = new MailParser(\file_get_contents($file));
         $expect = '<html><head>
@@ -126,7 +123,7 @@ additional tests.<br>It should look like in the picture attached.<br>Best
         $this->assertEquals('image/gif', $attachment[0]['type']);
         $this->assertEquals('av-7.gif', $attachment[0]['name']);
     }
-    
+
     public function testDecode()
     {
         $file = __DIR__ . '/emails/uid-02.eml';
@@ -135,7 +132,7 @@ additional tests.<br>It should look like in the picture attached.<br>Best
         $attachDir = __DIR__ . '/emails/attachments/';
         $savedAttachment = $Parser->decode($attachDir);
 
-        $attachmentFiles = \glob($attachDir.'*');
+        $attachmentFiles = \glob($attachDir . '*');
 
         // Clean up attachments dir
         \array_map('unlink', $attachmentFiles);

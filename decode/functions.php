@@ -8,12 +8,12 @@ if (!\function_exists('create_mail_pipe_db')) {
      * @return bool
      * @throws \Exception if creation failure
      */
-	function create_mail_pipe_db($dbc = null) 
-	{
-		if ($dbc instanceof \PDO) {
+    function create_mail_pipe_db($dbc = null)
+    {
+        if ($dbc instanceof \PDO) {
             $rows = $dbc->query("SHOW TABLES LIKE 'emails'")->rowCount();
-			if ($rows<1) {
-				$rows = $dbc->exec("CREATE TABLE emails (
+            if ($rows < 1) {
+                $rows = $dbc->exec("CREATE TABLE emails (
                     id int(255) NOT NULL AUTO_INCREMENT,
                     user varchar(255) NOT NULL,
                     toaddr varchar(255) NOT NULL,
@@ -30,12 +30,12 @@ if (!\function_exists('create_mail_pipe_db')) {
                 unset($rows);
                 $rows = $dbc->query("SHOW TABLES LIKE 'emails'")->rowCount();
                 if (!$rows)
-                    throw new \Exception("Failed to create emails database table.".\PHP_EOL.$dbc->errorInfo()[2]);
+                    throw new \Exception("Failed to create emails database table." . \PHP_EOL . $dbc->errorInfo()[2]);
             }
 
-			$rows = $dbc->query("SHOW TABLES LIKE 'files'")->rowCount();
-			if ($rows<1) {
-				$rows = $dbc->exec("CREATE TABLE files (
+            $rows = $dbc->query("SHOW TABLES LIKE 'files'")->rowCount();
+            if ($rows < 1) {
+                $rows = $dbc->exec("CREATE TABLE files (
 					id int(255) NOT NULL AUTO_INCREMENT,
 					email int(255) NOT NULL,
 					name varchar(255) NOT NULL,
@@ -46,16 +46,14 @@ if (!\function_exists('create_mail_pipe_db')) {
                     ) AUTO_INCREMENT=1;");
 
                 unset($rows);
-			    $rows = $dbc->query("SHOW TABLES LIKE 'files'")->rowCount();
+                $rows = $dbc->query("SHOW TABLES LIKE 'files'")->rowCount();
                 if (!$rows)
-                    throw new \Exception("Failed to create files database table.".\PHP_EOL.$dbc->errorInfo()[2]);
+                    throw new \Exception("Failed to create files database table." . \PHP_EOL . $dbc->errorInfo()[2]);
             }
-
-		} else {
+        } else {
             return false;
-		}
-		
-		return true;
+        }
+
+        return true;
     }
-    
 }

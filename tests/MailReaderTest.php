@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class MailReaderTest extends TestCase
 {
-
     const TEST_DB_USER = 'ez_test';
     const TEST_DB_PASSWORD = 'ezTest';
     const TEST_DB_NAME = 'ez_test';
@@ -21,18 +20,19 @@ class MailReaderTest extends TestCase
     {
         if (!\extension_loaded('pdo_mysql')) {
             $this->markTestSkipped(
-              'The pdo_mysql Lib is not available.'
+                'The pdo_mysql Lib is not available.'
             );
         }
 
-        $this->handle = new \PDO("mysql:host=".self::TEST_DB_HOST.
-            ";dbname=".self::TEST_DB_NAME.
-            ";charset=".self::TEST_DB_CHARSET.
-            ";port=".self::TEST_DB_PORT, 
-            self::TEST_DB_USER, 
-            self::TEST_DB_PASSWORD, 
+        $this->handle = new \PDO(
+            "mysql:host=" . self::TEST_DB_HOST .
+            ";dbname=" . self::TEST_DB_NAME .
+            ";charset=" . self::TEST_DB_CHARSET .
+            ";port=" . self::TEST_DB_PORT,
+            self::TEST_DB_USER,
+            self::TEST_DB_PASSWORD,
             array(
-                \PDO::ATTR_EMULATE_PREPARES => false, 
+                \PDO::ATTR_EMULATE_PREPARES => false,
                 \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
             )
@@ -77,7 +77,7 @@ class MailReaderTest extends TestCase
         $emailAttachments = $mr->getMessageAttachments($emailID);
         $saved = $mr->findDirectory('.');
         $attachDir = $saved  . \DIRECTORY_SEPARATOR;
-        
+
         $attachmentFiles = \glob($attachDir . '*');
         $this->assertEquals(2, \count($attachmentFiles));
 
@@ -93,16 +93,16 @@ class MailReaderTest extends TestCase
         $attachmentFiles = \glob($attachDir . '*');
         \array_map('unlink', $attachmentFiles);
         \rmdir($attachDir);
-        
+
         $this->expectExceptionMessage("getAllEmailAttachments does not exist");
         $emailAttachments[0]->getAllEmailAttachments();
     }
-    
+
     public function testReadEmail()
     {
         $this->handle->query('DROP TABLE IF EXISTS emails;');
         $this->handle->query('DROP TABLE IF EXISTS files;');
-        
+
         \create_mail_pipe_db($this->handle);
 
         $attachDir = __DIR__ . '/emails/attachments/';
@@ -127,7 +127,7 @@ class MailReaderTest extends TestCase
         $this->assertEquals('11.33 KB', $fileSaved[0]['size']);
         $this->assertEquals('image/gif', $fileSaved[0]['mime']);
 
-        $attachmentFiles = \glob($attachDir.'*');
+        $attachmentFiles = \glob($attachDir . '*');
 
         // Clean up attachments dir
         \array_map('unlink', $attachmentFiles);

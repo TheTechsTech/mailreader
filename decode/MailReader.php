@@ -18,7 +18,7 @@ use Mail\MailParser;
  *
  * See the README.md for the license, and other information
  */
-class MailReader 
+class MailReader
 {
     /**
      * Attachments Array
@@ -147,7 +147,7 @@ class MailReader
      */
     public function saveOff()
     {
-        $this->save_msg_to_db = false;        
+        $this->save_msg_to_db = false;
         return $this;
     }
 
@@ -155,25 +155,26 @@ class MailReader
     {
         $home = (\getenv('USERPROFILE') !== false) ? \getenv('USERPROFILE') : \getenv('HOME');
         $info = ($home !== false) ? $home : \dirname(__FILE__);
-        $findConfigPath = $info.\DIRECTORY_SEPARATOR;
+        $findConfigPath = $info . \DIRECTORY_SEPARATOR;
         $save_directory = '';
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {
             $info = \posix_getpwuid(\posix_getuid());
-            $findConfigPath = $info['dir'].\DIRECTORY_SEPARATOR;
+            $findConfigPath = $info['dir'] . \DIRECTORY_SEPARATOR;
         }
         if (!empty($startingDirectory))
-            $findConfigPath = $startingDirectory.\DIRECTORY_SEPARATOR;
+            $findConfigPath = $startingDirectory . \DIRECTORY_SEPARATOR;
 
-        if (($directoryHandle = @\opendir($findConfigPath)) == true ) {
+        if (($directoryHandle = @\opendir($findConfigPath)) == true) {
             while (($file = \readdir($directoryHandle)) !== false) {
-                if (\is_dir($findConfigPath.$file) 
-                    && (($file == '.' || $file == '..') !== true) 
+                if (
+                    \is_dir($findConfigPath . $file)
+                    && (($file == '.' || $file == '..') !== true)
                     && (\strpos($file, $directoryNamed) !== false)
                 ) {
-                    $save_directory = $findConfigPath.$file;
+                    $save_directory = $findConfigPath . $file;
                     break;
-               }
+                }
             }
             \closedir($directoryHandle);
         }
@@ -197,8 +198,8 @@ class MailReader
     {
         // Process the e-mail from stdin
         $fd = \fopen($src, 'r');
-        while (!\feof($fd)) { 
-            $this->raw .= \fread($fd, 1024); 
+        while (!\feof($fd)) {
+            $this->raw .= \fread($fd, 1024);
         }
 
         $this->decoded = new MailParser($this->raw);
@@ -234,7 +235,7 @@ class MailReader
     public function getMessageCount(string $email)
     {
         $dbc = $this->pdo;
-		if ($dbc instanceof \PDO) {
+        if ($dbc instanceof \PDO) {
             $messages = $dbc->prepare("SELECT count(*) FROM emails WHERE toaddr=?");
             if (!is_bool($messages)) {
                 $messages->execute([$email]);
@@ -250,7 +251,7 @@ class MailReader
     public function getMessages(string $email, int $offset = 0, int $max = 20)
     {
         $dbc = $this->pdo;
-		if ($dbc instanceof \PDO) {
+        if ($dbc instanceof \PDO) {
             $emails = $dbc->prepare("SELECT * FROM emails WHERE toaddr=:mail LIMIT :offset, :max");
             if (!is_bool($emails)) {
                 $emails->bindValue(':mail', $email);
@@ -264,9 +265,9 @@ class MailReader
                 }
 
                 unset($emails);
-                if (\count($records) > 0) 
+                if (\count($records) > 0)
                     return $records;
-                
+
                 return 0;
             }
         }
@@ -277,7 +278,7 @@ class MailReader
     public function getMessageAttachments(int $message_id)
     {
         $dbc = $this->pdo;
-		if ($dbc instanceof \PDO) {
+        if ($dbc instanceof \PDO) {
             $files = $dbc->prepare("SELECT * FROM files WHERE email=:id");
             if (!is_bool($files)) {
                 $files->bindValue(':id', $message_id, \PDO::PARAM_INT);
@@ -289,7 +290,7 @@ class MailReader
                 }
 
                 unset($files);
-                if (\count($records) > 0) 
+                if (\count($records) > 0)
                     return $records;
             }
         }
@@ -306,7 +307,7 @@ class MailReader
         $insert = $this->pdo->prepare("INSERT INTO emails (user, toaddr, sender, fromaddr, date, subject, plain, html) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
         // Replace non UTF-8 characters with their UTF-8 equivalent, or drop them
-        if (!$insert->execute(Array(
+        if (!$insert->execute(array(
             \mb_convert_encoding($this->to, 'UTF-8', 'UTF-8'),
             \mb_convert_encoding($this->to_email, 'UTF-8', 'UTF-8'),
             \mb_convert_encoding($this->from, 'UTF-8', 'UTF-8'),
@@ -327,7 +328,7 @@ class MailReader
         foreach ($this->saved_files as $data) {
             $insertFile = $this->pdo->prepare("INSERT INTO files (email, name, path, size, mime) VALUES (:email, :name, :path, :size, :mime)");
             $insertFile->bindParam(':email', $email_id);
-     	    $convertedFilename = \mb_convert_encoding($data['name'], 'UTF-8', 'UTF-8');
+            $convertedFilename = \mb_convert_encoding($data['name'], 'UTF-8', 'UTF-8');
             $insertFile->bindParam(':name', $convertedFilename);
             $insertFile->bindParam(':path', $data['path']);
             $insertFile->bindParam(':size', $data['size']);

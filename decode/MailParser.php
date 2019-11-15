@@ -46,7 +46,7 @@ class MailParser
      * @var array
      */
     protected $attachments = [];
-    
+
     /**
      * A safe place for files.
      *
@@ -56,18 +56,18 @@ class MailParser
 
     public function __construct($raw = null)
     {
-        if ( !empty($raw) ) {
+        if (!empty($raw)) {
             $this->parse($raw);
         }
     }
 
     public function parse($raw)
     {
-        if ( $raw !== null ) {
+        if ($raw !== null) {
             $this->raw = $raw;
         }
 
-        if ( $this->raw !== null ) {
+        if ($this->raw !== null) {
             $this->extractHeadersAndBody();
             return $this;
         }
@@ -75,7 +75,7 @@ class MailParser
 
     public function decode($attachment_directory = null, $saving = true)
     {
-        if ( $this->raw !== null ) {
+        if ($this->raw !== null) {
             if (!empty($attachment_directory))
                 $this->attachment_directory = $attachment_directory;
             elseif (empty($this->attachment_directory))
@@ -85,8 +85,8 @@ class MailParser
                 @\mkdir($this->attachment_directory, 0770, true);
 
             // add trailing slash if needed
-            if (!\preg_match('|\\/$|', $this->attachment_directory)) { 
-                $this->attachment_directory .= \DIRECTORY_SEPARATOR; 
+            if (!\preg_match('|\\/$|', $this->attachment_directory)) {
+                $this->attachment_directory .= \DIRECTORY_SEPARATOR;
             }
 
             // http://pear.php.net/manual/en/package.mail.mail-mimedecode.decode.php
@@ -98,22 +98,22 @@ class MailParser
                 'decode_bodies'  => true
             ]);
 
-            if ( isset($this->decoded->parts) && \is_array($this->decoded->parts) ) {
-                foreach ( $this->decoded->parts as $idx => $body_part ) {
+            if (isset($this->decoded->parts) && \is_array($this->decoded->parts)) {
+                foreach ($this->decoded->parts as $idx => $body_part) {
                     $this->decodePart($body_part, $saving);
                 }
             }
 
-            if ( isset($this->decoded->disposition) && $this->decoded->disposition == 'inline' ) {
+            if (isset($this->decoded->disposition) && $this->decoded->disposition == 'inline') {
                 $mime_type = "{$this->decoded->ctype_primary}/{$this->decoded->ctype_secondary}";
 
-                if ( isset($this->decoded->d_parameters) && \array_key_exists('filename', $this->decoded->d_parameters) ) {
+                if (isset($this->decoded->d_parameters) && \array_key_exists('filename', $this->decoded->d_parameters)) {
                     $filename = $this->decoded->d_parameters['filename'];
                 } else {
                     $filename = 'file';
                 }
 
-                if ( $this->isValidAttachment($mime_type) ) {
+                if ($this->isValidAttachment($mime_type)) {
                     $this->saveAttachment($filename, $this->decoded->body, $mime_type, $saving);
                 }
 
@@ -121,16 +121,16 @@ class MailParser
             }
 
             // We might also have uuencoded files. Check for those.
-            if ( empty($this->body) ) {
+            if (empty($this->body)) {
                 $this->body = isset($this->decoded->body) ? $this->decoded->body : "";
             }
 
-            if ( \preg_match("/begin ([0-7]{3}) (.+)\r?\n(.+)\r?\nend/Us", $this->body) > 0 ) {
-                foreach ( $decoder->uudecode($this->body) as $file ) {
+            if (\preg_match("/begin ([0-7]{3}) (.+)\r?\n(.+)\r?\nend/Us", $this->body) > 0) {
+                foreach ($decoder->uudecode($this->body) as $file) {
                     $this->saveAttachment($file['filename'], $file['filedata'], 'unknown', $saving);
                 }
                 // Strip out all the uuencoded attachments from the body
-                while ( \preg_match("/begin ([0-7]{3}) (.+)\r?\n(.+)\r?\nend/Us", $this->body) > 0 ) {
+                while (\preg_match("/begin ([0-7]{3}) (.+)\r?\n(.+)\r?\nend/Us", $this->body) > 0) {
                     $this->body = \preg_replace("/begin ([0-7]{3}) (.+)\r?\n(.+)\r?\nend/Us", "\n", $this->body);
                 }
             }
@@ -140,33 +140,33 @@ class MailParser
             return $this->attachments;
         }
     }
-		
-	/**
-	 * Detect and return an array of attachments and their data. 
+
+    /**
+     * Detect and return an array of attachments and their data. 
      * ```
      * Array([0] => 
      *  Array(
      *      [type] => audio/caf 
-	 *      [name] => example_vmr_09102012182307.3gp 
-	 *      [content] => Y2FmZgA
+     *      [name] => example_vmr_09102012182307.3gp 
+     *      [content] => Y2FmZgA
      *  ), Array(...)
      * )
      * ```
      * JSON format. 
      * ```
-	 *  [{
+     *  [{
      *      "type": "text/plain",
      *      "name": "text.txt",
      *      "content": "dGVTVGluZyA="
      *  }, {}]
      * ```
      * @param bool $json return data in JSON format
-	 * @return array|bool
-	 */
-	public function getAttachments($json = false)
-	{
-		$decoded = $this->decode(null, false);
-		return ($json) ? \json_encode($decoded) : $decoded;
+     * @return array|bool
+     */
+    public function getAttachments($json = false)
+    {
+        $decoded = $this->decode(null, false);
+        return ($json) ? \json_encode($decoded) : $decoded;
     }
 
     /**
@@ -214,13 +214,13 @@ class MailParser
                 $currentHeader = $newHeader;
             } else {
                 // more lines related to the current header
-                if ($currentHeader) { 
+                if ($currentHeader) {
                     // to prevent notice from empty lines
-        			if (\is_array($this->rawFields[$currentHeader])) {
-        				$this->rawFields[$currentHeader][\count($this->rawFields[$currentHeader]) - 1] .= \substr($line, 1);
-        			} else {
+                    if (\is_array($this->rawFields[$currentHeader])) {
+                        $this->rawFields[$currentHeader][\count($this->rawFields[$currentHeader]) - 1] .= \substr($line, 1);
+                    } else {
                         $this->rawFields[$currentHeader] .= \substr($line, 1);
-        			}
+                    }
                 }
             }
             $i++;
@@ -283,7 +283,7 @@ class MailParser
             $contentTypeRegex = '/^Content-Type: ?text\/html/i';
         else
             $contentTypeRegex = '/^Content-Type: ?text\/plain/i';
-        
+
         // there could be more than one boundary. This also skips the quotes if they are included.
         \preg_match_all('/(*ANYCRLF)boundary=(?:|")([a-zA-Z0-9_=\.\(\)_\/+-]+)(?:|")(?:$|;)/mi', $this->raw, $matches);
         $boundaries = $matches[1];
@@ -291,34 +291,33 @@ class MailParser
         foreach ($boundaries as $i => $v) {
             $boundaries[$i] = \trim(\str_replace(array("'", '"'), '', $v));
         }
-        
+
         foreach ($this->rawBodyLines as $line) {
             if (!$detectedContentType) {
-                
+
                 if (\preg_match($contentTypeRegex, $line, $matches)) {
                     $detectedContentType = true;
                 }
-                
-                if(\preg_match('/charset=(.*)/i', $line, $matches)) {
-                    $charset = \strtoupper(\trim($matches[1], '"')); 
-                }       
-                
-            } elseif ($detectedContentType && $waitingForContentStart) {
-                
+
                 if (\preg_match('/charset=(.*)/i', $line, $matches)) {
-                    $charset = \strtoupper(\trim($matches[1], '"')); 
-                }                 
-                
+                    $charset = \strtoupper(\trim($matches[1], '"'));
+                }
+            } elseif ($detectedContentType && $waitingForContentStart) {
+
+                if (\preg_match('/charset=(.*)/i', $line, $matches)) {
+                    $charset = \strtoupper(\trim($matches[1], '"'));
+                }
+
                 if ($contentTransferEncoding == null && \preg_match('/^Content-Transfer-Encoding: ?(.*)/i', $line, $matches)) {
                     $contentTransferEncoding = $matches[1];
-                }                
-                
+                }
+
                 if ($this->isNewLine($line)) {
                     $waitingForContentStart = false;
                 }
             } else {  // ($detectedContentType && !$waitingForContentStart)
                 // collecting the actual content until we find the delimiter
-                
+
                 // if the delimited is AAAAA, the line will be --AAAAA  - that's why we use substr
                 if (\is_array($boundaries)) {
                     if (\in_array(\substr($line, 2), $boundaries) || \in_array(\substr($line, 2, -2), $boundaries)) {
@@ -329,8 +328,7 @@ class MailParser
             }
         }
 
-        if (!$detectedContentType)
-        {
+        if (!$detectedContentType) {
             // if here, we missed the text/plain content-type (probably it was
             // in the header), thus we assume the whole body is what we are after
             $body = \implode("\n", $this->rawBodyLines);
@@ -342,17 +340,17 @@ class MailParser
         if ($contentTransferEncoding == 'base64')
             $body = \base64_decode($body);
         else if ($contentTransferEncoding == 'quoted-printable')
-            $body = \quoted_printable_decode($body);        
-        
-        if($charset != 'UTF-8') {
+            $body = \quoted_printable_decode($body);
+
+        if ($charset != 'UTF-8') {
             // FORMAT=FLOWED, despite being popular in emails, it is not
             // supported by iconv
             $charset = \str_replace("FORMAT=FLOWED", "", $charset);
-           
-	        $bodyCopy = $body; 
+
+            $bodyCopy = $body;
             $body = \iconv($charset, 'UTF-8//TRANSLIT', $body);
 
-             // iconv returns FALSE on failure
+            // iconv returns FALSE on failure
             if ($body === false) {
                 $body = \utf8_encode($bodyCopy);
             }
@@ -376,7 +374,7 @@ class MailParser
     {
         $body = $this->getBody('HTML');
         $tmp = explode("</html>", $body);
-        return $tmp[0]."</html>"; // omit any attachments.
+        return $tmp[0] . "</html>"; // omit any attachments.
     }
 
     /**
@@ -389,7 +387,7 @@ class MailParser
         if (!isset($this->rawFields['to'])) {
             throw new \Exception("Couldn't find the recipients of the email");
         }
-        
+
         // @see https://www.php.net/manual/en/function.imap-utf8.php#102081
         return \iconv_mime_decode($this->rawFields['to'], 0, "UTF-8");
     }
@@ -404,7 +402,7 @@ class MailParser
         if (!isset($this->rawFields['subject'])) {
             throw new \Exception("Couldn't find the subject of the email");
         }
-        
+
         // @see https://www.php.net/manual/en/function.imap-utf8.php#102081
         return \iconv_mime_decode($this->rawFields['subject'], 0, "UTF-8");
     }
@@ -576,36 +574,36 @@ class MailParser
      */
     private function decodePart($body_part, $saving = true)
     {
-        if ( isset($body_part->ctype_parameters) && \is_array($body_part->ctype_parameters) ) {
-            if ( \array_key_exists('name', $body_part->ctype_parameters) ) {
+        if (isset($body_part->ctype_parameters) && \is_array($body_part->ctype_parameters)) {
+            if (\array_key_exists('name', $body_part->ctype_parameters)) {
                 $filename = $body_part->ctype_parameters['name'];
-            } elseif ( \array_key_exists('filename', $body_part->ctype_parameters) ) {
+            } elseif (\array_key_exists('filename', $body_part->ctype_parameters)) {
                 $filename = $body_part->ctype_parameters['filename'];
             }
-        } elseif ( isset($body_part->d_parameters) && \is_array($body_part->d_parameters) ) {
-            if ( \array_key_exists('filename', $body_part->d_parameters) ) {
+        } elseif (isset($body_part->d_parameters) && \is_array($body_part->d_parameters)) {
+            if (\array_key_exists('filename', $body_part->d_parameters)) {
                 $filename = $body_part->d_parameters['filename'];
             }
         }
 
-        if ( !isset($filename) ) {
+        if (!isset($filename)) {
             $filename = "file";
         }
 
         $mime_type = "{$body_part->ctype_primary}/{$body_part->ctype_secondary}";
 
-        if ( $this->debug ) {
+        if ($this->debug) {
             print "Found body part type $mime_type\n";
         }
 
-        if ( $body_part->ctype_primary == 'multipart' ) {
-            if ( \is_array($body_part->parts) ) {
-                foreach ( $body_part->parts as $ix => $sub_part ) {
+        if ($body_part->ctype_primary == 'multipart') {
+            if (\is_array($body_part->parts)) {
+                foreach ($body_part->parts as $ix => $sub_part) {
                     $this->decodePart($sub_part, $saving);
                 }
             }
-        } elseif ( !isset($body_part->disposition) || $body_part->disposition == 'inline' ) {
-            switch ( $mime_type ) {
+        } elseif (!isset($body_part->disposition) || $body_part->disposition == 'inline') {
+            switch ($mime_type) {
                 case 'text/plain':
                     $this->body .= \mb_convert_encoding($body_part->body, $this->charset, $this->charset) . "\n";
                     break;
@@ -613,12 +611,12 @@ class MailParser
                     $this->html .= \mb_convert_encoding($body_part->body, $this->charset, $this->charset) . "\n";
                     break;
                 default:
-                    if ( $this->isValidAttachment($mime_type) ) {
+                    if ($this->isValidAttachment($mime_type)) {
                         $this->saveAttachment($filename, $body_part->body, $mime_type, $saving);
                     }
             }
         } else {
-            if ( $this->isValidAttachment($mime_type) ) {
+            if ($this->isValidAttachment($mime_type)) {
                 $this->saveAttachment($filename, $body_part->body, $mime_type, $saving);
             }
         }
@@ -626,7 +624,7 @@ class MailParser
 
     private function isValidAttachment($mime_type)
     {
-        if (\in_array($mime_type, $this->allowedMimeTypes) && !\in_array($mime_type, $this->disallowedMimeTypes)) {            
+        if (\in_array($mime_type, $this->allowedMimeTypes) && !\in_array($mime_type, $this->disallowedMimeTypes)) {
             return true;
         }
 
@@ -644,18 +642,18 @@ class MailParser
     private function saveAttachment($filename, $contents, $mime_type = 'unknown', $saving = true)
     {
         $filename = \mb_convert_encoding($filename, $this->charset, $this->charset);
-        $dot_ext = '.'.$this->getFileExtension($filename);
+        $dot_ext = '.' . $this->getFileExtension($filename);
         $unlocked_and_unique = false;
         $i = 0;
 
         if ($saving) {
-            while ( !$unlocked_and_unique && $i++ < 10 ) {
+            while (!$unlocked_and_unique && $i++ < 10) {
                 $name = \uniqid('attachment_');
                 $path = $this->attachment_directory . $name . $dot_ext;
                 // Attempt to lock
                 $outFile = \fopen($path, 'wb');
 
-                if ( \flock($outFile, \LOCK_EX) ) {
+                if (\flock($outFile, \LOCK_EX)) {
                     $unlocked_and_unique = true;
                 } else {
                     \flock($outFile, \LOCK_UN);
@@ -663,12 +661,12 @@ class MailParser
                 }
             }
 
-            if ( isset($outFile) && $outFile !== false ) {
+            if (isset($outFile) && $outFile !== false) {
                 \fwrite($outFile, $contents);
                 \fclose($outFile);
             }
 
-            if ( isset($name, $path) ) {
+            if (isset($name, $path)) {
                 $this->attachments[] = [
                     'name' => $filename,
                     'path' => $path,
@@ -693,7 +691,7 @@ class MailParser
      */
     private function formatBytes($bytes, $precision = 2)
     {
-        $units = [ 'B', 'KB', 'MB', 'GB', 'TB' ];
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
         $bytes = \max($bytes, 0);
         $pow = \floor(($bytes ? \log($bytes) : 0) / \log(1024));
@@ -706,11 +704,11 @@ class MailParser
 
     private function getFileExtension($filename)
     {
-        if ( \substr($filename, 0, 1) == '.' ) {
+        if (\substr($filename, 0, 1) == '.') {
             return \substr($filename, 1);
         }
         $pieces = \explode('.', $filename);
-        if ( \count($pieces) > 1 ) {
+        if (\count($pieces) > 1) {
             return \strtolower(\array_pop($pieces));
         }
     }

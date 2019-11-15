@@ -33,40 +33,41 @@
 // Where should discovered files go
 //$save_directory = __DIR__; // stick them in the current directory
 $info = \dirname(__FILE__);
-$findConfigPath = $info.\DIRECTORY_SEPARATOR;
-$save_directory = $findConfigPath.'mailPiped' ; // stick in the script's directory
-if (('\\' !== \DIRECTORY_SEPARATOR) && \is_dir($findConfigPath.'public_html')) {
+$findConfigPath = $info . \DIRECTORY_SEPARATOR;
+$save_directory = $findConfigPath . 'mailPiped'; // stick in the script's directory
+if (('\\' !== \DIRECTORY_SEPARATOR) && \is_dir($findConfigPath . 'public_html')) {
     $info = \posix_getpwuid(\posix_getuid());
-    $findConfigPath = $info['dir'].\DIRECTORY_SEPARATOR.'public_html'.\DIRECTORY_SEPARATOR;
-    $save_directory = $info['dir'].\DIRECTORY_SEPARATOR.'mailPiped' ; // stick in the process user directory
+    $findConfigPath = $info['dir'] . \DIRECTORY_SEPARATOR . 'public_html' . \DIRECTORY_SEPARATOR;
+    $save_directory = $info['dir'] . \DIRECTORY_SEPARATOR . 'mailPiped'; // stick in the process user directory
 }
 
 $config_path = null;
 // locate database config file
-if (($directoryHandle = @\opendir($findConfigPath)) == true ) {
+if (($directoryHandle = @\opendir($findConfigPath)) == true) {
     while (($file = \readdir($directoryHandle)) !== false) {
         // Make sure we're not dealing with a file or a link to the parent directory
-        if ((\is_dir($findConfigPath.$file) && (($file == '.' || $file == '..') !== true) ) 
-            && (\is_file($findConfigPath.$file.\DIRECTORY_SEPARATOR.'mailConfig.php'))
+        if ((\is_dir($findConfigPath . $file) && (($file == '.' || $file == '..') !== true))
+            && (\is_file($findConfigPath . $file . \DIRECTORY_SEPARATOR . 'mailConfig.php'))
         ) {
-			$config_path = $findConfigPath.$file.\DIRECTORY_SEPARATOR;
-			break;
-	   }
+            $config_path = $findConfigPath . $file . \DIRECTORY_SEPARATOR;
+            break;
+        }
     }
-	\closedir($directoryHandle);
+    \closedir($directoryHandle);
 }
 
 // Require the file with the MailReader class in it
-require_once($config_path.'..'.\DIRECTORY_SEPARATOR.'vendor'.\DIRECTORY_SEPARATOR.'autoload.php');
+require_once($config_path . '..' . \DIRECTORY_SEPARATOR . 'vendor' . \DIRECTORY_SEPARATOR . 'autoload.php');
 
 use Mail\MailReader;
 
-require($config_path.'mailConfig.php');
-$pdo = new \PDO("mysql:host=$db_host;dbname=$db_name;charset=$db_charset;port=$db_port", 
-    $db_user, 
-    $db_pass, 
+require($config_path . 'mailConfig.php');
+$pdo = new \PDO(
+    "mysql:host=$db_host;dbname=$db_name;charset=$db_charset;port=$db_port",
+    $db_user,
+    $db_pass,
     array(
-        \PDO::ATTR_EMULATE_PREPARES => false, 
+        \PDO::ATTR_EMULATE_PREPARES => false,
         \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
         \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
     )
