@@ -1,7 +1,7 @@
 mailreader
 ====================================
 
-[![Build Status](https://travis-ci.org/techno-express/mailreader.svg?branch=master)](https://travis-ci.org/techno-express/mailreader)[![codecov](https://codecov.io/gh/techno-express/mailreader/branch/master/graph/badge.svg)](https://codecov.io/gh/techno-express/mailreader)[![Maintainability](https://api.codeclimate.com/v1/badges/d55439701ae29a2bbab6/maintainability)](https://codeclimate.com/github/techno-express/mailreader/maintainability)
+[![Build Status](https://travis-ci.org/techno-express/mailreader.svg?branch=master)](https://travis-ci.org/techno-express/mailreader)[![Build status](https://ci.appveyor.com/api/projects/status/wgxhjqdgqs189xqv/branch/master?svg=true)](https://ci.appveyor.com/project/techno-express/mailreader/branch/master)[![codecov](https://codecov.io/gh/techno-express/mailreader/branch/master/graph/badge.svg)](https://codecov.io/gh/techno-express/mailreader)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/743c6ea9df90493f9bb56df8e427dfe8)](https://www.codacy.com/manual/techno-express/mailreader?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=techno-express/mailreader&amp;utm_campaign=Badge_Grade)[![Maintainability](https://api.codeclimate.com/v1/badges/d55439701ae29a2bbab6/maintainability)](https://codeclimate.com/github/techno-express/mailreader/maintainability)
 
 Receive mail and attachments with PHP
 
@@ -80,7 +80,7 @@ Setup
 
 Configure your mail server to pipe emails to this script. See
 <http://stuporglue.org/add-an-email-address-that-forwards-to-a-script/>
-for instructions.  
+for instructions.
 
 Make this script *executable*, and edit the configuration options to suit your needs. Change permissions of the directories so that the user executing the script (probably the mail user) will have write permission to the file upload directory.
 
