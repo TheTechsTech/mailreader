@@ -1,15 +1,7 @@
 language: php
 
 php:
-    - 5.6
-    - 7.0
     - 7.1
-    - 7.2
-
-matrix:
-    allow_failures:
-        - php: 5.6
-        - php: 7.2
 
 env:
     - MYSQL_HOST=127.0.0.1 MYSQL_USER=root
@@ -26,5 +18,5 @@ before_script:
 after_success:
     - bash <(curl -s https://codecov.io/bash)
 
-script: 
+script:
     - vendor/bin/phpunit --coverage-clover=coverage.xml

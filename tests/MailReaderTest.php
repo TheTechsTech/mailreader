@@ -16,7 +16,7 @@ class MailReaderTest extends TestCase
 
     protected $handle;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\extension_loaded('pdo_mysql')) {
             $this->markTestSkipped(
@@ -39,7 +39,7 @@ class MailReaderTest extends TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->handle->query('DROP TABLE emails;');
         $this->handle->query('DROP TABLE files;');
