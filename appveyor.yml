@@ -6,8 +6,15 @@ clone_folder: c:\projects\php-project-workspace
 ## Build matrix for lowest and highest possible targets
 environment:
   matrix:
-  - dependencies: highest
-    php_ver_target: 7.3
+  - php_ver_target: 7.1
+  MYSQL_DATABASE: ez_test
+  MYSQL_HOST: localhost
+  MYSQL_USER: root
+  MYSQL_PASSWORD: Password12!
+  MYSQL_PATH: C:\Program Files\MySQL\MySQL Server 5.7
+
+services:
+    - mysql
 
 ## Set up environment variables
 init:
@@ -16,10 +23,12 @@ init:
     - SET PHP=1 # This var is connected to PHP install cache
     - SET ANSICON=121x90 (121x90)
 
-## Install PHP and composer, and run the appropriate composer commandand XDEBUG
+## Install PHP and composer, and run the appropriate composer command Get the MSSQL DLL's and XDEBUG
 install:
-    - IF EXIST c:\tools\php (SET PHP=0) # Checks for the PHP install being cached
-    - ps: appveyor-retry cinst --params '""/InstallDir:C:\tools\php""' --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $env:php_ver_target | sort { [version]($_ -split '\|' | select -last 1) } -Descending | Select-Object -first 1) -replace '[php|]','')
+    - IF EXIST c:\tools\php (SET PHP=0)
+    - ps: >-
+          appveyor-retry cinst --params '""/InstallDir:C:\tools\php""' --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $env:php_ver_target | sort { [version]($_ -split '\|' | select -last 1) } -Descending | Select-Object -first 1) -replace '[php|]','')
+    - appveyor-retry cinst -y sqlite
     - cd c:\tools\php
     - IF %PHP%==1 copy php.ini-production php.ini /Y
     - IF %PHP%==1 echo date.timezone="UTC" >> php.ini
@@ -27,9 +36,13 @@ install:
     - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini
     - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
     - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini
-    - IF %PHP%==1 appveyor-retry appveyor DownloadFile https://xdebug.org/files/php_xdebug-2.7.2-7.3-vc15-nts-x86_64.dll -FileName c:\tools\php\ext\php_xdebug-2.7.2-7.3-vc15-nts-x86_64.dll
+    - IF %PHP%==1 echo extension=php_sqlite3.dll >> php.ini
+    - IF %PHP%==1 echo extension=php_pdo_sqlite.dll >> php.ini
+    - IF %PHP%==1 echo extension=php_mysqli.dll >> php.ini
+    - IF %PHP%==1 echo extension=php_pdo_mysql.dll >> php.ini
+    - IF %PHP%==1 appveyor-retry appveyor DownloadFile https://xdebug.org/files/php_xdebug-2.8.0-7.1-vc14-nts-x86_64.dll -FileName c:\tools\php\ext\php_xdebug-2.8.0-7.1-vc14-nts-x86_64.dll
     - IF %PHP%==1 echo [xdebug] >> php.ini
-    - IF %PHP%==1 echo zend_extension=php_xdebug-2.7.2-7.3-vc15-nts-x86_64.dll >> php.ini
+    - IF %PHP%==1 echo zend_extension=php_xdebug-2.8.0-7.1-vc14-nts-x86_64.dll >> php.ini
     - IF %PHP%==1 echo zend.assertions=1 >> php.ini
     - IF %PHP%==1 echo assert.exception=On >> php.ini
     - IF %PHP%==1 echo xdebug.remote_enable=1 >> php.ini
@@ -38,12 +51,16 @@ install:
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar
     - cd c:\projects\php-project-workspace
-    - IF %dependencies%==lowest appveyor-retry composer update --prefer-lowest --no-progress --profile -n
-    - IF %dependencies%==current appveyor-retry composer install --no-progress --profile
-    - IF %dependencies%==highest appveyor-retry composer update --no-progress --profile -n
-   ## - composer show
     - composer self-update
     - composer require php-coveralls/php-coveralls
+
+before_test:
+  - SET PATH=%MYSQL_PATH%\bin;%PATH%
+  - mysqladmin --host=%MYSQL_HOST% --user=%MYSQL_USER% --password=%MYSQL_PASSWORD% create %MYSQL_DATABASE%
+  # mysql
+  - mysql -u root -p"Password12!" -e "CREATE DATABASE IF NOT EXISTS ez_test;"
+  - mysql -u root -p"Password12!" -e "GRANT ALL PRIVILEGES ON ez_test.* TO ez_test@localhost IDENTIFIED BY 'ezTest'";
+  - mysql -u root -p"Password12!" -e "FLUSH PRIVILEGES;"
 
 on_success:
   - ps: |
@@ -54,4 +71,4 @@ on_success:
 ## Run the actual test
 test_script:
     - cd c:\projects\php-project-workspace
-    - vendor/bin/phpunit --coverage-clover=coverage.xml
+    - vendor\bin\phpunit --coverage-clover=coverage.xml
